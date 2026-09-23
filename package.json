@@ -1,0 +1,19 @@
+{
+  "name": "alphasignals-trading-platform",
+  "version": "1.0.0",
+  "description": "24/7 Permanent Stock Analysis & Auto-Trading Terminal for Binance & Zerodha Kite",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "build": "npm --prefix client install && npm --prefix client run build && npm --prefix server install",
+    "dev": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "axios": "^1.7.9"
+  }
+}

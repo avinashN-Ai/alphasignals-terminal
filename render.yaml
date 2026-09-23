@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: alphasignals-terminal
+    env: node
+    plan: free
+    buildCommand: "npm --prefix server install && npm --prefix client install && npm --prefix client run build"
+    startCommand: "node server/server.js"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000

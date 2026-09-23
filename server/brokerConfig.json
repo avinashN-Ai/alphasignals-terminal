@@ -1,0 +1,304 @@
+{
+  "activeBroker": "binance",
+  "autoPilotEnabled": false,
+  "maxRiskPerTradePct": 2,
+  "defaultProduct": "CNC",
+  "brokers": {
+    "paper": {
+      "name": "Paper Trading (Virtual ₹1,00,000)",
+      "connected": true,
+      "balance": 100000,
+      "initialBalance": 100000
+    },
+    "zerodha": {
+      "name": "Zerodha (Kite Connect)",
+      "apiKey": "",
+      "apiSecret": "",
+      "accessToken": "",
+      "connected": false,
+      "balance": 0
+    },
+    "upstox": {
+      "name": "Upstox (API v2)",
+      "apiKey": "",
+      "apiSecret": "",
+      "redirectUri": "http://localhost:5000/api/brokers/upstox/callback",
+      "accessToken": "",
+      "connected": false,
+      "balance": 0
+    },
+    "dhan": {
+      "name": "Dhan (DhanHQ API)",
+      "clientId": "",
+      "accessToken": "",
+      "connected": false,
+      "balance": 0
+    },
+    "binance": {
+      "name": "Binance (Crypto & International)",
+      "apiKey": "",
+      "apiSecret": "",
+      "connected": false,
+      "balance": 4868.87
+    }
+  },
+  "positions": [
+    {
+      "id": "binance-sim-1790176656979",
+      "broker": "binance",
+      "symbol": "XRPUSDT",
+      "cleanSymbol": "XRPUSDT",
+      "type": "BUY",
+      "quantity": 10,
+      "entryPrice": 1.531,
+      "currentPrice": 1.5115,
+      "target": 1.73,
+      "stopLoss": 1.38,
+      "pnl": -0.19,
+      "pnlPct": -1.27,
+      "currency": "$",
+      "entryTime": "8:47:36 PM",
+      "entryDate": "2026-09-23",
+      "status": "OPEN",
+      "signalConfidence": 95
+    },
+    {
+      "id": "binance-sim-1790176484712",
+      "broker": "binance",
+      "symbol": "SOLUSDT",
+      "cleanSymbol": "SOL",
+      "type": "BUY",
+      "quantity": 1,
+      "entryPrice": 115.82,
+      "currentPrice": 114.41,
+      "target": 120.5,
+      "stopLoss": 112,
+      "pnl": -1.41,
+      "pnlPct": -1.22,
+      "currency": "$",
+      "entryTime": "8:44:44 PM",
+      "entryDate": "2026-09-23",
+      "status": "OPEN",
+      "signalConfidence": 75
+    },
+    {
+      "id": "pos-1790176067875",
+      "broker": "paper",
+      "symbol": "IOC.NS",
+      "cleanSymbol": "IOC",
+      "type": "BUY",
+      "quantity": 50,
+      "entryPrice": 138.15,
+      "currentPrice": 138.15,
+      "target": 143.68,
+      "stopLoss": 134.7,
+      "pnl": 0,
+      "pnlPct": 0,
+      "entryTime": "8:37:47 PM",
+      "entryDate": "2026-09-23",
+      "status": "OPEN",
+      "signalConfidence": 75
+    }
+  ],
+  "tradeLogs": [
+    {
+      "id": "log-1790178472153-211",
+      "time": "9:17:52 PM",
+      "date": "2026-09-23",
+      "message": "Switched active broker to: Binance (Crypto & International)",
+      "type": "INFO",
+      "details": {}
+    },
+    {
+      "id": "log-1790178471973-598",
+      "time": "9:17:51 PM",
+      "date": "2026-09-23",
+      "message": "Switched active broker to: Binance (Crypto & International)",
+      "type": "INFO",
+      "details": {}
+    },
+    {
+      "id": "log-1790178471542-759",
+      "time": "9:17:51 PM",
+      "date": "2026-09-23",
+      "message": "Switched active broker to: Binance (Crypto & International)",
+      "type": "INFO",
+      "details": {}
+    },
+    {
+      "id": "log-1790176656981-266",
+      "time": "8:47:36 PM",
+      "date": "2026-09-23",
+      "message": "[Binance App] 🟢 BUY 10x XRPUSDT @ $1.531 (Auto-Exit Active: Target $1.73, Stop $1.38)",
+      "type": "BUY",
+      "details": {
+        "id": "binance-sim-1790176656979",
+        "broker": "binance",
+        "symbol": "XRPUSDT",
+        "cleanSymbol": "XRPUSDT",
+        "type": "BUY",
+        "quantity": 10,
+        "entryPrice": 1.531,
+        "currentPrice": 1.5115,
+        "target": 1.73,
+        "stopLoss": 1.38,
+        "pnl": -0.19,
+        "pnlPct": -1.27,
+        "currency": "$",
+        "entryTime": "8:47:36 PM",
+        "entryDate": "2026-09-23",
+        "status": "OPEN",
+        "signalConfidence": 95
+      }
+    },
+    {
+      "id": "log-1790176484714-576",
+      "time": "8:44:44 PM",
+      "date": "2026-09-23",
+      "message": "[Binance App] 🟢 BUY 1x SOL @ $115.82 (Auto-Exit Active: Target $120.5, Stop $112)",
+      "type": "BUY",
+      "details": {
+        "id": "binance-sim-1790176484712",
+        "broker": "binance",
+        "symbol": "SOLUSDT",
+        "cleanSymbol": "SOL",
+        "type": "BUY",
+        "quantity": 1,
+        "entryPrice": 115.82,
+        "currentPrice": 114.41,
+        "target": 120.5,
+        "stopLoss": 112,
+        "pnl": -1.41,
+        "pnlPct": -1.22,
+        "currency": "$",
+        "entryTime": "8:44:44 PM",
+        "entryDate": "2026-09-23",
+        "status": "OPEN",
+        "signalConfidence": 75
+      }
+    },
+    {
+      "id": "log-1790176454043-451",
+      "time": "8:44:14 PM",
+      "date": "2026-09-23",
+      "message": "Switched active broker to: Binance (Crypto & International)",
+      "type": "INFO",
+      "details": {}
+    },
+    {
+      "id": "log-1790176080632-342",
+      "time": "8:38:00 PM",
+      "date": "2026-09-23",
+      "message": "[Paper Trading] Virtual wallet reset to ₹1,00,000",
+      "type": "INFO",
+      "details": {}
+    },
+    {
+      "id": "log-1790176067879-799",
+      "time": "8:37:47 PM",
+      "date": "2026-09-23",
+      "message": "[Paper Trading] 🟢 BUY 50x IOC @ ₹138.15 (Target: ₹143.68, Stop: ₹134.7)",
+      "type": "BUY",
+      "details": {
+        "id": "pos-1790176067875",
+        "broker": "paper",
+        "symbol": "IOC.NS",
+        "cleanSymbol": "IOC",
+        "type": "BUY",
+        "quantity": 50,
+        "entryPrice": 138.15,
+        "currentPrice": 138.15,
+        "target": 143.68,
+        "stopLoss": 134.7,
+        "pnl": 0,
+        "pnlPct": 0,
+        "entryTime": "8:37:47 PM",
+        "entryDate": "2026-09-23",
+        "status": "OPEN",
+        "signalConfidence": 75
+      }
+    },
+    {
+      "id": "log-1790176025101-347",
+      "time": "8:37:05 PM",
+      "date": "2026-09-23",
+      "message": "Switched active broker to: Paper Trading (Virtual ₹1,00,000)",
+      "type": "INFO",
+      "details": {}
+    },
+    {
+      "id": "log-1790175551343-942",
+      "time": "8:29:11 PM",
+      "date": "2026-09-23",
+      "message": "Switched active broker to: Zerodha (Kite Connect)",
+      "type": "INFO",
+      "details": {}
+    },
+    {
+      "id": "log-1790175540462-57",
+      "time": "8:29:00 PM",
+      "date": "2026-09-23",
+      "message": "Switched active broker to: Upstox (API v2)",
+      "type": "INFO",
+      "details": {}
+    },
+    {
+      "id": "log-1790175432031-129",
+      "time": "8:27:12 PM",
+      "date": "2026-09-23",
+      "message": "[PAPER] 🎯 AUTO-EXIT: TATASTEEL closed @ ₹190.82 (+₹366.2 / 23.75%) • Reason: Target Hit (Profit Booked)",
+      "type": "EXIT_PROFIT",
+      "details": {
+        "id": "pos-1790175429633",
+        "broker": "paper",
+        "symbol": "TATASTEEL.NS",
+        "cleanSymbol": "TATASTEEL",
+        "type": "BUY",
+        "quantity": 10,
+        "entryPrice": 154.2,
+        "currentPrice": 190.82,
+        "target": 160.5,
+        "stopLoss": 150,
+        "pnl": 366.2,
+        "pnlPct": 23.75,
+        "entryTime": "8:27:09 PM",
+        "entryDate": "2026-09-23",
+        "status": "CLOSED",
+        "signalConfidence": 75,
+        "exitPrice": 190.82,
+        "exitTime": "8:27:12 PM",
+        "exitDate": "2026-09-23",
+        "exitReason": "TARGET_HIT"
+      }
+    },
+    {
+      "id": "log-1790175429680-678",
+      "time": "8:27:09 PM",
+      "date": "2026-09-23",
+      "message": "[Paper Trading] 🟢 BUY 10x TATASTEEL @ ₹154.2 (Target: ₹160.5, Stop: ₹150)",
+      "type": "BUY",
+      "details": {
+        "id": "pos-1790175429633",
+        "broker": "paper",
+        "symbol": "TATASTEEL.NS",
+        "cleanSymbol": "TATASTEEL",
+        "type": "BUY",
+        "quantity": 10,
+        "entryPrice": 154.2,
+        "currentPrice": 190.82,
+        "target": 160.5,
+        "stopLoss": 150,
+        "pnl": 366.2,
+        "pnlPct": 23.75,
+        "entryTime": "8:27:09 PM",
+        "entryDate": "2026-09-23",
+        "status": "CLOSED",
+        "signalConfidence": 75,
+        "exitPrice": 190.82,
+        "exitTime": "8:27:12 PM",
+        "exitDate": "2026-09-23",
+        "exitReason": "TARGET_HIT"
+      }
+    }
+  ]
+}
