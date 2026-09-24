@@ -283,27 +283,58 @@ app.post('/api/backtest', async (req, res) => {
   }
 });
 
-app.get('/api/search', (req, res) => {
-  const query = (req.query.q || '').toUpperCase().trim();
-  if (!query) return res.json([]);
+app.get('/api/search', async (req, res) => {
+  try {
+    const query = (req.query.q || '').toUpperCase().trim();
+    if (!query) return res.json([]);
 
-  const allItems = [...INDIAN_STOCKS, ...US_STOCKS, ...BINANCE_CRYPTO];
-  const matches = allItems.filter(s =>
-    s.symbol.toUpperCase().includes(query) ||
-    s.name.toUpperCase().includes(query) ||
-    s.sector.toUpperCase().includes(query)
-  );
+    const screener = screenerCache.data.length > 0 ? screenerCache.data : await getOrComputeScreener();
+    const matches = screener.filter(s =>
+      s.symbol.toUpperCase().includes(query) ||
+      s.cleanSymbol.toUpperCase().includes(query) ||
+      s.name.toUpperCase().includes(query) ||
+      s.sector.toUpperCase().includes(query)
+    );
 
-  if (matches.length === 0 && query.length >= 2) {
-    matches.push({
-      symbol: query.includes('.') ? query : `${query}.NS`,
-      name: `${query} (Custom Search)`,
-      sector: 'Custom',
-      basePrice: 500
-    });
+    // If user searches for any custom ticker not in the default 33 list, offer both NSE & Binance options
+    if (query.length >= 2) {
+      const cleanQ = query.replace('.NS', '').replace('USDT', '');
+      const hasExactNSE = matches.some(m => m.cleanSymbol === cleanQ && m.market === 'IN');
+      const hasExactCrypto = matches.some(m => m.cleanSymbol === `${cleanQ}USDT` || m.symbol === `${cleanQ}USDT`);
+
+      if (!hasExactCrypto && !query.includes('.')) {
+        matches.push({
+          symbol: `${cleanQ}USDT`,
+          cleanSymbol: `${cleanQ}USDT`,
+          name: `${cleanQ} / USDT (Binance Live Crypto)`,
+          sector: 'Binance Crypto',
+          currency: '$',
+          market: 'CRYPTO',
+          price: 10,
+          signal: 'BUY',
+          confidence: 75
+        });
+      }
+
+      if (!hasExactNSE) {
+        matches.push({
+          symbol: `${cleanQ}.NS`,
+          cleanSymbol: cleanQ,
+          name: `${cleanQ} (NSE India - Zerodha Kite)`,
+          sector: 'NSE Equity',
+          currency: '₹',
+          market: 'IN',
+          price: 500,
+          signal: 'BUY',
+          confidence: 75
+        });
+      }
+    }
+
+    res.json(matches.slice(0, 12));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  res.json(matches);
 });
 
 // ==========================================

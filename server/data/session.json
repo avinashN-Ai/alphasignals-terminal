@@ -9,7 +9,7 @@
     "apiSecret": "",
     "connected": true,
     "isDemo": true,
-    "balance": 4885.45,
+    "balance": 5610.49,
     "accountInfo": {
       "accountType": "DEMO / SANDBOX",
       "canTrade": true,
@@ -62,16 +62,20 @@
       "type": "BUY",
       "quantity": 1,
       "entryPrice": 114.55,
-      "currentPrice": 114.55,
+      "currentPrice": 725.04,
       "target": 119.13,
       "stopLoss": 111.68,
-      "pnl": 0,
-      "pnlPct": 0,
+      "pnl": 610.49,
+      "pnlPct": 532.95,
       "currency": "$",
       "entryTime": "10:07:23 PM",
       "entryDate": "2026-09-23",
-      "status": "OPEN",
-      "signalConfidence": 75
+      "status": "CLOSED",
+      "signalConfidence": 75,
+      "exitPrice": 725.04,
+      "exitTime": "5:26:07 PM",
+      "exitDate": "2026-09-24",
+      "exitReason": "TARGET_HIT"
     },
     {
       "id": "kite-pos-1790181342801",
@@ -98,6 +102,36 @@
     }
   ],
   "tradeLogs": [
+    {
+      "id": "log-1790250968065-344",
+      "time": "5:26:08 PM",
+      "date": "2026-09-24",
+      "message": "[BINANCE] 🎯 AUTO-EXIT: SOLUSDT closed @ $725.04 (+$610.49 / 532.95%) • Target Hit (Profit Booked)",
+      "type": "EXIT_PROFIT",
+      "details": {
+        "id": "binance-pos-1790181443629",
+        "broker": "binance",
+        "symbol": "SOLUSDT",
+        "cleanSymbol": "SOLUSDT",
+        "type": "BUY",
+        "quantity": 1,
+        "entryPrice": 114.55,
+        "currentPrice": 725.04,
+        "target": 119.13,
+        "stopLoss": 111.68,
+        "pnl": 610.49,
+        "pnlPct": 532.95,
+        "currency": "$",
+        "entryTime": "10:07:23 PM",
+        "entryDate": "2026-09-23",
+        "status": "CLOSED",
+        "signalConfidence": 75,
+        "exitPrice": 725.04,
+        "exitTime": "5:26:07 PM",
+        "exitDate": "2026-09-24",
+        "exitReason": "TARGET_HIT"
+      }
+    },
     {
       "id": "log-1790181447548-58",
       "time": "10:07:27 PM",

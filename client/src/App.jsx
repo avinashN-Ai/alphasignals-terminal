@@ -16,6 +16,7 @@ import {
 
 export default function App() {
   const [market, setMarket] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
   const [stocks, setStocks] = useState([]);
   const [summary, setSummary] = useState(null);
   const [selectedStock, setSelectedStock] = useState(null);
@@ -89,7 +90,10 @@ export default function App() {
       <Navbar
         market={market}
         setMarket={setMarket}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
         onSelectStock={(sym) => setSelectedStock(sym)}
+        onTradeStock={(stock) => setOrderStock(stock)}
         onRefresh={() => {
           loadData(true);
           fetchBrokerStatus();
@@ -135,6 +139,7 @@ export default function App() {
         {/* Screener and All Stocks Table */}
         <StockTable
           stocks={stocks}
+          searchQuery={searchQuery}
           isLoading={isLoading}
           onSelectStock={(sym) => setSelectedStock(sym)}
           onTradeStock={(stock) => setOrderStock(stock)}

@@ -4,36 +4,44 @@ import {
   Search, 
   RefreshCw, 
   BookOpen, 
-  X
+  X,
+  BarChart2,
+  Zap
 } from 'lucide-react';
 
 export default function Navbar({ 
   market, 
   setMarket, 
+  searchQuery,
+  setSearchQuery,
   onSelectStock, 
+  onTradeStock,
   onRefresh, 
   isRefreshing, 
   onOpenGuide,
   onOpenBrokerManager,
   brokerStatus
 }) {
-  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const searchRef = useRef(null);
+  const headerRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
+      if (headerRef.current && !headerRef.current.contains(e.target)) {
         setShowDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
-    if (searchQuery.trim().length >= 1) {
+    if (searchQuery && searchQuery.trim().length >= 1) {
       const delayDebounce = setTimeout(async () => {
         try {
           const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
@@ -45,7 +53,7 @@ export default function Navbar({
         } catch (e) {
           console.error(e);
         }
-      }, 200);
+      }, 150);
       return () => clearTimeout(delayDebounce);
     } else {
       setSearchResults([]);
@@ -62,8 +70,79 @@ export default function Navbar({
     ? (isConnected ? `🟡 Binance ($${Number(balance || 0).toFixed(0)})` : '🟡 Login Binance')
     : (isConnected ? `🔵 Kite (₹${Number(balance || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })})` : '🔵 Login Kite');
 
+  const handleViewStock = (symbol) => {
+    setShowDropdown(false);
+    onSelectStock(symbol);
+  };
+
+  const handleBuyStock = (item) => {
+    setShowDropdown(false);
+    if (onTradeStock) onTradeStock(item);
+  };
+
+  const renderDropdownResults = () => {
+    if (!showDropdown || searchResults.length === 0) return null;
+    return (
+      <div className="absolute left-0 right-0 mt-1.5 bg-[#141925] border-2 border-emerald-500/40 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-80 overflow-y-auto divide-y divide-[#222B3C]">
+        <div className="px-3.5 py-2 bg-[#0E121B] flex items-center justify-between text-[11px] text-slate-400 font-bold">
+          <span>Found {searchResults.length} matching stocks / crypto</span>
+          <button onClick={() => setShowDropdown(false)} className="text-slate-400 hover:text-white">Close ✕</button>
+        </div>
+        {searchResults.map((item, idx) => {
+          const sym = item.cleanSymbol || item.symbol.replace('.NS', '');
+          const isCrypto = item.symbol.endsWith('USDT') || item.market === 'CRYPTO';
+          return (
+            <div
+              key={idx}
+              className="px-3.5 py-3 hover:bg-[#1C2436] flex items-center justify-between gap-2 transition-colors"
+            >
+              <div 
+                onClick={() => handleViewStock(item.symbol)}
+                className="flex-1 cursor-pointer min-w-0"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="font-black text-sm text-white">{sym}</span>
+                  <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${
+                    isCrypto ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-500/20 text-blue-400'
+                  }`}>
+                    {isCrypto ? '🟡 BINANCE' : '🔵 KITE NSE'}
+                  </span>
+                  {item.price && (
+                    <span className="text-xs font-mono font-bold text-emerald-400">
+                      {item.currency || (isCrypto ? '$' : '₹')}{item.price}
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-slate-400 truncate mt-0.5">{item.name}</div>
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleViewStock(item.symbol)}
+                  className="px-3 py-2 rounded-xl bg-[#222C42] hover:bg-[#2C3954] active:scale-95 text-white text-xs font-extrabold flex items-center gap-1 border border-slate-600"
+                >
+                  <BarChart2 className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Chart</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleBuyStock(item)}
+                  className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black flex items-center gap-1 shadow-md shadow-emerald-600/20"
+                >
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>BUY</span>
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
-    <header className="sticky top-0 z-40 bg-[#0D111A]/95 backdrop-blur-xl border-b border-[#222938] shadow-lg">
+    <header ref={headerRef} className="sticky top-0 z-40 bg-[#0D111A]/95 backdrop-blur-xl border-b border-[#222938] shadow-lg">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         
         {/* Top Row: Brand Logo + Broker Pill + Refresh */}
@@ -72,7 +151,10 @@ export default function Navbar({
           {/* Logo */}
           <div 
             className="flex items-center gap-2 cursor-pointer shrink-0 active:scale-95 transition-transform" 
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={() => {
+              setSearchQuery('');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           >
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-amber-500 flex items-center justify-center shadow-md shadow-emerald-500/20">
               <TrendingUp className="w-5 h-5 text-white" />
@@ -125,48 +207,27 @@ export default function Navbar({
           </div>
 
           {/* Desktop Search Bar */}
-          <div className="hidden sm:block flex-1 max-w-xs relative" ref={searchRef}>
+          <div className="hidden sm:block flex-1 max-w-sm relative">
             <div className="relative">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-emerald-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery && setShowDropdown(true)}
-                placeholder="Search BTC, SOL, RELIANCE..."
-                className="w-full bg-[#151922] border border-[#252D3D] rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                placeholder="Search BTC, SOL, RELIANCE, ZOMATO..."
+                className="w-full bg-[#151922] border border-[#2B3548] rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
               />
               {searchQuery && (
                 <button 
                   onClick={() => { setSearchQuery(''); setShowDropdown(false); }}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-4 h-4" />
                 </button>
               )}
             </div>
-
-            {showDropdown && searchResults.length > 0 && (
-              <div className="absolute left-0 right-0 mt-2 bg-[#151A26] border border-[#2B3548] rounded-2xl shadow-2xl overflow-hidden z-50 max-h-80 overflow-y-auto">
-                {searchResults.map((item, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => {
-                      onSelectStock(item.symbol);
-                      setShowDropdown(false);
-                      setSearchQuery('');
-                    }}
-                    className="px-4 py-3 hover:bg-[#1E2638] active:bg-[#252F45] cursor-pointer flex items-center justify-between border-b border-[#222B3C] last:border-0"
-                  >
-                    <div>
-                      <div className="font-bold text-xs text-white">{item.symbol.replace('.NS', '')}</div>
-                      <div className="text-[11px] text-slate-400">{item.name}</div>
-                    </div>
-                    <div className="text-xs text-emerald-400 font-bold">Chart →</div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {renderDropdownResults()}
           </div>
 
           {/* Right Action Buttons */}
@@ -206,48 +267,25 @@ export default function Navbar({
         {/* Mobile Full-Width Search Bar (Visible on Mobile Phones) */}
         <div className="sm:hidden pb-2.5 relative">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-emerald-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => searchQuery && setShowDropdown(true)}
-              placeholder="🔍 Search BTC, SOL, RELIANCE, TATA..."
-              className="w-full bg-[#151A24] border border-[#263042] rounded-xl pl-10 pr-9 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 shadow-inner"
+              placeholder="🔍 Search BTC, SOL, RELIANCE, ZOMATO..."
+              className="w-full bg-[#151A24] border border-[#2E3A52] rounded-xl pl-10 pr-9 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 shadow-inner"
             />
             {searchQuery && (
               <button 
                 onClick={() => { setSearchQuery(''); setShowDropdown(false); }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 bg-slate-800 rounded-full p-1"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
-
-          {showDropdown && searchResults.length > 0 && (
-            <div className="absolute left-0 right-0 mt-1.5 bg-[#161C28] border border-[#2C374B] rounded-2xl shadow-2xl overflow-hidden z-50 max-h-72 overflow-y-auto">
-              {searchResults.map((item, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => {
-                    onSelectStock(item.symbol);
-                    setShowDropdown(false);
-                    setSearchQuery('');
-                  }}
-                  className="px-4 py-3.5 active:bg-[#222C40] cursor-pointer flex items-center justify-between border-b border-[#222B3C] last:border-0"
-                >
-                  <div>
-                    <div className="font-extrabold text-sm text-white">{item.symbol.replace('.NS', '')}</div>
-                    <div className="text-xs text-slate-400">{item.name}</div>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-xs font-bold">
-                    View →
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+          {renderDropdownResults()}
         </div>
 
       </div>

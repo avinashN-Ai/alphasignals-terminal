@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GharConnect - Home Phone, Smart TV & JioFiber Remote Support</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+  <!-- Top Navigation & Mode Switcher -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">🏠</div>
+      <div>
+        <h1>GharConnect <span style="display:inline; color:#60a5fa; font-size:0.85rem;">v1.0 Pro</span></h1>
+        <span>Ghar ke Phone, Smart TV & JioFiber ka Remote Control + Live Assist</span>
+      </div>
+    </div>
+
+    <div class="mode-switcher">
+      <button class="mode-btn active" id="btnModeSplit" onclick="switchViewMode('split')">
+        ⚡ Split Test Mode (Dono Ek Saath)
+      </button>
+      <button class="mode-btn" id="btnModeAdmin" onclick="switchViewMode('admin')">
+        👨‍💻 Mera Admin Control
+      </button>
+      <button class="mode-btn" id="btnModeFamily" onclick="switchViewMode('family')">
+        📱 Ghar ka Phone / TV Mode
+      </button>
+    </div>
+
+    <div class="network-badge" id="jioNetworkBadge">
+      <div class="pulse-dot"></div>
+      <span id="networkIpLabel">JioFiber Online • Checking IP...</span>
+    </div>
+  </header>
+
+  <!-- Share URL Info Bar -->
+  <div style="background: rgba(37,99,235,0.14); border-bottom: 1px solid rgba(59,130,246,0.3); padding: 8px 24px; font-size: 0.83rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+    <div>
+      🔗 <strong>Ghar ke Mobile/TV me kholne ka Link:</strong>
+      <code id="familyShareUrl" style="background:#0f172a; padding:3px 8px; border-radius:6px; color:#60a5fa; margin-left:6px;">http://localhost:4000/?mode=family</code>
+      <button onclick="copyFamilyLink()" style="background:#2563eb; color:white; border:none; border-radius:6px; padding:3px 10px; margin-left:6px; cursor:pointer; font-size:0.76rem;">📋 Copy Link</button>
+    </div>
+    <div style="color:#cbd5e1;">
+      💡 <em>Tip: Left side se click ya command bhejein, Right side ke Ghar Phone/TV par live asar dekhein!</em>
+    </div>
+  </div>
+
+  <!-- Main Workspace -->
+  <main class="main-container">
+    <div class="split-view" id="mainGrid">
+
+      <!-- ====================================================
+           LEFT COLUMN: ADMIN REMOTE CONTROL DASHBOARD
+           ==================================================== -->
+      <section id="adminSection">
+
+        <!-- Connected Home Devices Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📡 Ghar ke Connected Devices (Phone & Smart TV)</div>
+            <span style="font-size:0.78rem; color:#94a3b8;" id="deviceCountBadge">1 Online</span>
+          </div>
+          <div class="devices-grid" id="devicesGrid">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Live Screen / Camera Viewer + Laser Pointer -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              🖥️ Live Screen & Camera Monitor
+              <span id="activeStreamBadge" style="background:#10b981; color:#052e16; font-size:0.72rem; padding:2px 8px; border-radius:99px; font-weight:800;">LIVE MIRROR</span>
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="btn btn-dark" style="padding:6px 10px; font-size:0.76rem;" onclick="sendAdminCmd('request-stream', { mode: 'simulated' })">
+                📱 Phone/TV Screen
+              </button>
+              <button class="btn btn-primary" style="padding:6px 10px; font-size:0.76rem;" onclick="sendAdminCmd('request-stream', { mode: 'screen' })">
+                🖥️ Real Screen Share
+              </button>
+              <button class="btn btn-purple" style="padding:6px 10px; font-size:0.76rem;" onclick="sendAdminCmd('request-stream', { mode: 'camera' })">
+                📷 Back Camera (TV/Router Dekhein)
+              </button>
+            </div>
+          </div>
+
+          <!-- Interactive Stage: Clicking sends Red Laser Pointer to Family Device -->
+          <div class="screen-stage-wrapper" id="adminScreenStage" onclick="handleAdminStageClick(event)">
+            <img id="adminRemoteImg" alt="Live Family Device Stream" style="display:block;" />
+            <video id="adminRemoteVideo" autoplay playsinline style="display:none;"></video>
+            <div class="stage-overlay-hint">
+              👆 <strong>Click Anywhere on Screen:</strong> Jahan click karenge, Ghar ke phone par wahan <strong>Lal Ghera (Yahan Dabaiye)</strong> dikhega!
+            </div>
+          </div>
+
+          <!-- Quick Remote Actions -->
+          <div class="control-grid">
+            <button class="btn btn-danger" onclick="sendAdminCmd('siren', { duration: 6000 })">
+              🔔 Tez Siren / Ring Bajao
+            </button>
+            <button class="btn btn-warning" onclick="sendAdminCmd('stop-siren', {})">
+              🔇 Siren Band Karo
+            </button>
+            <button class="btn btn-success" onclick="sendAdminCmd('open-app', { app: 'whatsapp', label: 'WhatsApp Video Call', url: 'https://wa.me/' })">
+              📞 WhatsApp Open Karo
+            </button>
+            <button class="btn btn-primary" onclick="sendAdminCmd('open-app', { app: 'jiofiber', label: 'JioFiber Router Settings', url: 'http://192.168.29.1' })">
+              🌐 JioFiber Router (192.168.29.1)
+            </button>
+          </div>
+
+          <!-- Hindi Voice Announcement (Text-to-Speech) -->
+          <div style="margin-top: 16px; background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color);">
+            <div style="font-size:0.86rem; font-weight:700; margin-bottom:6px;">
+              🗣️ Ghar ke Phone/TV se Aawaz me Bulwayein (Hindi Voice Speaker Alert):
+            </div>
+            <div class="tts-box">
+              <input type="text" id="ttsInput" class="tts-input" placeholder="Yahan likhein (e.g. Mummy phone uthao, ya Wi-Fi ka switch on karo)..." value="Mummy main bahar se phone check kar raha hu, lal button dabaiye" />
+              <button class="btn btn-primary" onclick="sendVoiceMessage()">🔊 Bolkar Sunao</button>
+            </div>
+            <div class="preset-chips">
+              <span class="chip" onclick="quickSpeak('Mummy phone silent se hatao aur mera call uthao!')">🔊 Phone uthao</span>
+              <span class="chip" onclick="quickSpeak('JioFiber router ka switch ek baar band karke chalu karo.')">🔌 Router Restart karo</span>
+              <span class="chip" onclick="quickSpeak('Screen par jahan lal ghera dikh raha hai wahan ungli se dabaiye.')">👆 Lal Ghere par dabao</span>
+              <span class="chip" onclick="quickSpeak('TV ka HDMI ya Jio Set Top Box remote se OK button dabao.')">📺 TV OK dabao</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Smart TV / Jio Set-Top Box Virtual Remote & App Launcher -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📺 Smart TV & Jio Set-Top Box Remote Controller</div>
+            <span style="font-size:0.75rem; color:#60a5fa;">One-Click App & Channel Control</span>
+          </div>
+
+          <div class="tv-remote-layout">
+            <!-- D-Pad Navigation -->
+            <div>
+              <div style="text-align:center; font-size:0.76rem; color:#94a3b8; margin-bottom:6px;">TV Navigation D-Pad</div>
+              <div class="dpad">
+                <div></div>
+                <button class="dpad-btn" onclick="sendTvKey('UP')">▲</button>
+                <div></div>
+                <button class="dpad-btn" onclick="sendTvKey('LEFT')">◀</button>
+                <button class="dpad-btn dpad-ok" onclick="sendTvKey('OK')">OK</button>
+                <button class="dpad-btn" onclick="sendTvKey('RIGHT')">▶</button>
+                <button class="dpad-btn" onclick="sendTvKey('BACK')" style="font-size:0.7rem;">↩ Back</button>
+                <button class="dpad-btn" onclick="sendTvKey('DOWN')">▼</button>
+                <button class="dpad-btn" onclick="sendTvKey('HOME')" style="font-size:0.7rem;">🏠 Home</button>
+              </div>
+            </div>
+
+            <!-- Volume & Quick TV Apps -->
+            <div style="flex:1; min-width:220px;">
+              <div style="font-size:0.8rem; font-weight:700; margin-bottom:8px;">Direct App / Channel Chalu Karein:</div>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                <button class="btn btn-danger" onclick="sendAdminCmd('open-app', { app: 'youtube', label: 'YouTube TV', url: 'https://www.youtube.com' })">▶️ YouTube Chalu</button>
+                <button class="btn btn-primary" onclick="sendAdminCmd('open-app', { app: 'jiotv', label: 'JioTV / Live Channels', url: 'https://www.jiocinema.com' })">📺 JioTV / Cinema</button>
+                <button class="btn btn-purple" onclick="sendAdminCmd('open-app', { app: 'hotstar', label: 'Disney+ Hotstar', url: 'https://www.hotstar.com' })">⭐ Hotstar</button>
+                <button class="btn btn-success" onclick="sendAdminCmd('open-app', { app: 'settings', label: 'Wi-Fi & Network Settings', url: '#settings' })">⚙️ Wi-Fi Settings</button>
+              </div>
+              <div style="display:flex; gap:8px; margin-top:10px;">
+                <button class="btn btn-dark" style="flex:1;" onclick="sendTvKey('VOL_DOWN')">🔉 Vol -</button>
+                <button class="btn btn-dark" style="flex:1;" onclick="sendTvKey('MUTE')">🔇 Mute</button>
+                <button class="btn btn-dark" style="flex:1;" onclick="sendTvKey('VOL_UP')">🔊 Vol +</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ====================================================
+           RIGHT COLUMN: GHAR KA PHONE / TV CLIENT VIEW
+           ==================================================== -->
+      <section id="familySection">
+        <div class="family-phone-frame" id="familyPhoneContainer">
+
+          <!-- Top Phone Status Bar -->
+          <div class="family-status-bar">
+            <div>
+              <strong>📱 <span id="familyDeviceTitle">Mummy ka Phone (Ghar)</span></strong>
+              <select id="familyRoleSelect" onchange="changeFamilyDeviceProfile()" style="background:#1e293b; color:white; border:1px solid #475569; border-radius:6px; padding:2px 6px; font-size:0.75rem; margin-left:6px;">
+                <option value="Mummy ka Phone|phone">📱 Mummy ka Phone</option>
+                <option value="Papa ka Phone|phone">📱 Papa ka Phone</option>
+                <option value="Hall Smart TV (JioBox)|tv">📺 Hall Smart TV (JioBox)</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <span id="familyWifiTag">📶 JioFiber 5G</span>
+              <span id="familyBatteryTag">🔋 88%</span>
+            </div>
+          </div>
+
+          <!-- Big Elder-Friendly SOS Help Button -->
+          <button class="sos-giant-btn" onclick="triggerFamilySOS()">
+            🚨 MADAD CHAHIYE (SOS BHEJEIN)
+          </button>
+
+          <!-- Elder-Friendly Camera & Screen Share Buttons -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+            <button class="btn btn-primary" onclick="startFamilyRealScreenShare()">
+              📲 Screen Dikhayein
+            </button>
+            <button class="btn btn-purple" onclick="startFamilyRealCamera()">
+              📷 Camera se TV/Router Dikhayein
+            </button>
+          </div>
+
+          <!-- Interactive Family Device Screen Surface -->
+          <div class="family-screen-surface" id="familyScreenSurface">
+            <!-- Voice Alert Popup Banner (Hidden until Admin sends message) -->
+            <div class="family-voice-banner view-hidden" id="familyVoiceBanner">
+              <span id="familyVoiceText">🔊 Message...</span>
+              <button onclick="dismissVoiceBanner()" style="background:#000; color:#fff; border:none; padding:4px 10px; border-radius:6px; cursor:pointer;">OK</button>
+            </div>
+
+            <!-- Red Laser Touch Pointer (Controlled remotely by Admin clicks!) -->
+            <div class="family-laser-pointer view-hidden" id="familyLaserPointer">
+              <div class="family-laser-label" id="familyLaserLabel">👆 Yahan Dabaiye!</div>
+            </div>
+
+            <!-- Live Canvas representing the Phone/TV UI (and real Camera/Screen stream when active) -->
+            <canvas id="familyInteractiveCanvas" width="480" height="360"></canvas>
+            <video id="familyLocalVideo" autoplay muted playsinline style="display:none; width:100%; height:360px; object-fit:cover;"></video>
+          </div>
+
+          <!-- Live Activity Log inside Family View -->
+          <div style="margin-top:14px;">
+            <div style="font-size:0.78rem; color:#94a3b8; margin-bottom:6px; font-weight:600;">📋 Recent Remote Support Activity:</div>
+            <div class="log-list" id="activityLogContainer"></div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

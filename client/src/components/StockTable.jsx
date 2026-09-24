@@ -10,20 +10,22 @@ import {
   Search
 } from 'lucide-react';
 
-export default function StockTable({ stocks, onSelectStock, onTradeStock, isLoading }) {
+export default function StockTable({ stocks, searchQuery = '', onSelectStock, onTradeStock, isLoading }) {
   const [viewMode, setViewMode] = useState('GRID'); // 'GRID' | 'TABLE'
   const [filter, setFilter] = useState('ALL');
   const [localSearch, setLocalSearch] = useState('');
 
+  const activeQuery = (searchQuery || localSearch).trim().toUpperCase();
+
   const processedStocks = useMemo(() => {
     let result = [...stocks];
 
-    if (localSearch.trim()) {
-      const q = localSearch.toUpperCase();
+    if (activeQuery) {
       result = result.filter(s => 
-        s.symbol.toUpperCase().includes(q) || 
-        s.name.toUpperCase().includes(q) ||
-        s.sector.toUpperCase().includes(q)
+        s.symbol.toUpperCase().includes(activeQuery) || 
+        (s.cleanSymbol && s.cleanSymbol.toUpperCase().includes(activeQuery)) ||
+        s.name.toUpperCase().includes(activeQuery) ||
+        s.sector.toUpperCase().includes(activeQuery)
       );
     }
 
@@ -41,7 +43,7 @@ export default function StockTable({ stocks, onSelectStock, onTradeStock, isLoad
 
     result.sort((a, b) => b.confidence - a.confidence);
     return result;
-  }, [stocks, filter, localSearch]);
+  }, [stocks, filter, activeQuery]);
 
   const getSignalBadge = (signal, confidence) => {
     if (signal === 'STRONG BUY') {
@@ -168,9 +170,99 @@ export default function StockTable({ stocks, onSelectStock, onTradeStock, isLoad
           <span className="text-sm font-semibold">Scanning live Binance &amp; Kite NSE markets...</span>
         </div>
       ) : processedStocks.length === 0 ? (
-        <div className="bg-[#151922] border border-[#232936] rounded-2xl py-14 text-center text-slate-400 text-sm">
-          No stocks or coins match your selected filter.
-        </div>
+        activeQuery ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Custom NSE India Card */}
+            <div className="bg-[#151924] border-2 border-blue-500/40 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+              <div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-black text-lg text-white">{activeQuery.replace('.NS', '')}</h3>
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                      🔵 KITE NSE
+                    </span>
+                  </div>
+                  <span className="text-xs font-bold text-emerald-400">Live NSE Search</span>
+                </div>
+                <p className="text-xs text-slate-300 mt-1">
+                  {activeQuery.replace('.NS', '')} (Indian Stock Market - Live Chart &amp; Accuracy)
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-[#232B3C] grid grid-cols-2 gap-2.5">
+                <button
+                  onClick={() => onSelectStock(`${activeQuery.replace('.NS', '').replace('USDT', '')}.NS`)}
+                  className="py-3 px-3 rounded-xl bg-[#1D2536] hover:bg-[#252F44] active:scale-95 text-white font-black text-xs flex items-center justify-center gap-1.5 border border-blue-500/40"
+                >
+                  <BarChart2 className="w-4 h-4 text-blue-400" />
+                  <span>View Live Chart</span>
+                </button>
+                <button
+                  onClick={() => onTradeStock({
+                    symbol: `${activeQuery.replace('.NS', '').replace('USDT', '')}.NS`,
+                    cleanSymbol: activeQuery.replace('.NS', '').replace('USDT', ''),
+                    name: `${activeQuery} (NSE India)`,
+                    currency: '₹',
+                    market: 'IN',
+                    price: 500,
+                    signal: 'BUY',
+                    confidence: 75
+                  })}
+                  className="py-3 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 active:scale-95 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-md"
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>BUY / TRADE</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Custom Binance Crypto Card */}
+            <div className="bg-[#151924] border-2 border-amber-500/40 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+              <div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-black text-lg text-white">{activeQuery.replace('USDT', '').replace('.NS', '')}USDT</h3>
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                      🟡 BINANCE CRYPTO
+                    </span>
+                  </div>
+                  <span className="text-xs font-bold text-amber-400">Live Binance Search</span>
+                </div>
+                <p className="text-xs text-slate-300 mt-1">
+                  {activeQuery.replace('USDT', '').replace('.NS', '')} / USDT (Binance Global Crypto Pair)
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-[#232B3C] grid grid-cols-2 gap-2.5">
+                <button
+                  onClick={() => onSelectStock(`${activeQuery.replace('USDT', '').replace('.NS', '')}USDT`)}
+                  className="py-3 px-3 rounded-xl bg-[#1D2536] hover:bg-[#252F44] active:scale-95 text-white font-black text-xs flex items-center justify-center gap-1.5 border border-amber-500/40"
+                >
+                  <BarChart2 className="w-4 h-4 text-amber-400" />
+                  <span>View Live Chart</span>
+                </button>
+                <button
+                  onClick={() => onTradeStock({
+                    symbol: `${activeQuery.replace('USDT', '').replace('.NS', '')}USDT`,
+                    cleanSymbol: `${activeQuery.replace('USDT', '').replace('.NS', '')}USDT`,
+                    name: `${activeQuery} / USDT (Binance Crypto)`,
+                    currency: '$',
+                    market: 'CRYPTO',
+                    price: 10,
+                    signal: 'BUY',
+                    confidence: 75
+                  })}
+                  className="py-3 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 active:scale-95 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md"
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>BUY / TRADE</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-[#151922] border border-[#232936] rounded-2xl py-14 text-center text-slate-400 text-sm">
+            No stocks or coins match your selected filter.
+          </div>
+        )
       ) : viewMode === 'GRID' ? (
         
         /* 1. MOBILE-FIRST CARDS GRID VIEW */
