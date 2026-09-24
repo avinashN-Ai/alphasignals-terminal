@@ -201,11 +201,16 @@ export default function BrokerManagerModal({ isOpen, onClose, onRefreshPositions
   const totalOpenPnl = openPositions.reduce((acc, p) => acc + (p.pnl || 0), 0);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
-      <div className="bg-[#11151F] border border-[#262D3D] rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-md">
+      <div className="bg-[#11151F] border-t sm:border border-[#262D3D] rounded-t-3xl sm:rounded-3xl w-full max-w-4xl max-h-[93vh] flex flex-col shadow-2xl overflow-hidden pb-safe animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
         
+        {/* Drag Handle for Mobile */}
+        <div className="sm:hidden flex justify-center pt-2.5 pb-1 bg-[#0C0F17]">
+          <div className="w-12 h-1.5 rounded-full bg-slate-700"></div>
+        </div>
+
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-[#1E2535] bg-[#0C0F17] flex flex-wrap items-center justify-between gap-4">
+        <div className="px-4 py-3.5 sm:p-5 border-b border-[#1E2535] bg-[#0C0F17] flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-500 to-blue-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
               <Zap className="w-6 h-6 text-white" />

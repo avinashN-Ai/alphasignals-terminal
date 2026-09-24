@@ -46,11 +46,16 @@ export default function StockModal({ symbol, onClose, onTradeStock }) {
   if (!symbol) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-[#121620] border border-[#2B3547] rounded-3xl w-full max-w-5xl max-h-[95vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-sm">
+      <div className="bg-[#121620] border-t sm:border border-[#2B3547] rounded-t-3xl sm:rounded-3xl w-full max-w-5xl max-h-[94vh] flex flex-col shadow-2xl overflow-hidden pb-safe animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
         
+        {/* Drag Handle for Mobile */}
+        <div className="sm:hidden flex justify-center pt-2.5 pb-1 bg-[#0E121A]">
+          <div className="w-12 h-1.5 rounded-full bg-slate-700"></div>
+        </div>
+
         {/* Modal Top Header */}
-        <div className="p-4 sm:p-5 border-b border-[#232936] bg-[#0E121A] flex flex-wrap items-center justify-between gap-4">
+        <div className="px-4 py-3.5 sm:p-5 border-b border-[#232936] bg-[#0E121A] flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-base text-white">
               {symbol.replace('.NS', '').replace('.BO', '').slice(0, 4)}
